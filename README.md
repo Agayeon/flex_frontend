@@ -1,123 +1,95 @@
-# memento-frontend (Flex Team Frontend 사전 과제)
+# flex_frontend_submit  
+(Flex Team Frontend 사전 과제)
 
-- 이전에 진행했던 팀 프로젝트인 **금융 멘토링 플랫폼 `me:mento`**를  
-  프론트엔드 사전 과제 제출 목적에 맞게 재구성했습니다.
-- 백엔드·DB 연동은 제거하고,  
-  **홈(로그인 모달) → 예약 → 결제 성공** 흐름을 중심으로  
-  구조, 설계 의도, 핵심 로직을 설명할 수 있도록 가지치기했습니다.
+이 레포지토리는 이전에 진행했던 팀 프로젝트인 금융 멘토링 플랫폼 `me:mento`를 기반으로 플렉스팀의 프론트엔드 사전 과제 제출에 맞게 재구성했습니다.
+
+백엔드 및 DB 연동 등은 배제하고, **메인(홈)화면 -> 로그인 모달 -> 예약 -> 결제 성공**까지의 사용자 흐름을 중심으로 화면 구조, 상태 관리 방식, 컴포넌트 분리 기준을 드러내는데 집중했습니다. 
 
 ---
 
-## 실행 방법
-```bash
-npm install
-npm run dev
+## 주요 기능
 
-테스트 계정 (Mock)
-- ID: flex
-- PW: 1234
-```
+- 로그인 모달을 통한 사용자 인증(mock)
+- 로그인 상태 및 role에 따른 메인 화면(UI) 분기
+- 캘린더 날짜 및 시간 선택 기반 예약
+- 예약 완료 후 결제 성공 모달
 
-과제 특성상 백엔드 연동 없이 동작 확인이 가능하도록 mock 인증으로 구성했습니다.  
+> 실제 API 연동 없이도 사용자 흐름을 위한 UI/UX 구조를 확인할 수 있도록 구성했습니다.
+---
 
-## 핵심 경로
+## 코드 구조 및 설계 의도 
+
+이 프로젝트는 기능 구현 보다는 **구조와 설계 의도를 명확시 설명하기 위한 코드 구성**에 중점을 두었습니다.
+실무에 가까운 FSD 개념을 참고하여 구조를 분리했습니다.
+
+- `app`  
+  전역 설정, Provider 구성, 라우팅 및 레이아웃을 담당합니다.
+
+- `pages`  
+  사용자 흐름 기준의 화면 단위로 구성했으며, 페이지의 UI/UX를 담당합니다.
+
+- `widgets`
+  캘린더, 시간 선택, 로그인 모달과 같이 재사용성과 유지보수가 가능한 UI를 컴포넌트화해 분리했습니다.
+
+- `entities`  
+  로그인과 같이 화면 전반에서 공통으로 사용하는 핵식 로직을 모아 관리했습니다.
+
+- `shared`  
+   여러 화면에서 반복해 사용되는 UI, 컴포넌트, 훅, 유틸 함수를 모아 관리했습니다.
+
+이러한 구조를 통해 각 영역의 역할을 나누어 유지했습니다.
+
+### 예약–결제 흐름 설계 의도
+
+본 과제에서는 구현된 서비스 전반을 보여주기 보단 프론트엔드의 화면 흐름 설계, 상태 관리, 컴포넌트 분리 기준이 드러나도록 구성했습니다.  
+그중에서도 **사용자 흐름과 상태 관리가 가장 잘 드러나는 예약(Booking) 화면을 핵심으로 설계**했습니다.
+
+예약 페이지에서는 날짜 → 시간 선택으로 사용자 흐름에 따라 상태를 관리하고, 선택 가능한 시간과 불가능한 시간을 구분해 사용자가 현재 선택 가능한 범위를 인지할 수 있도록 구성했습니다.
+
+예약 확인(결제) 페이지는 사용자가 선택한 정보를 재확인 할 수 있도록 했으며 결제 API 대신 mock 결제 방식을 사용했습니다.
+
+---
+
+
+## 핵심 논리
+- 로그인 여부와 사용자 role 상태에 따라 홈 화면 UI가 분기됩니다.
+- 백엔드 서버와의 연결이 끊겼기 때문에 인증 상태는 `useAuth` 훅에서 관리해 페이지나 UI 컴포넌트가 인증 구현 방식에 직접 의존하지 않도록 했습니다.
+- 사용자의 흐름에 맞게 mock 인증 방식을 사용해 백엔드 연동 없이도 전체 흐름을 확인할 수 있도록 구성했습니다.
+
+## 페이지 구성
 - `/` : 홈 (로그인 모달 포함)
 - `/booking` : 예약 페이지
 - `/payments/success` : 결제 성공 페이지
 
-## 주요 기능
-
-### 1) 홈 + 로그인 모달
-- 홈 화면에서 로그인 모달(LoginSheet)을 열고 닫을 수 있습니다.
-- 올바른 계정(`flex / 1234`) 입력 시 로그인됩니다.
-- 로그인 여부 및 role에 따라 홈 화면 문구와 UI가 변경됩니다.
-
-### 2) 예약 페이지
-- 캘린더 및 시간 선택 UI를 제공합니다.
-- 예약 관련 UI는 `widgets (Calendar, TimeGrid)`로 분리하여 구성했습니다.
-
-### 3) 결제 성공 페이지
-- 결제 완료 후 성공 페이지 진입 및 관련 UI 구성을 포함합니다.
 
 ## 프로젝트 구조 (아키텍처)
+```
 src/
-├─ app/                    # 앱 진입 및 전역 설정
-│  ├─ App.tsx              # RouterProvider 연결
-│  ├─ providers/           # 전역 Provider 묶음
-│  │  ├─ AppProviders.tsx
-│  │  └─ QueryProvider.tsx
-│  └─ routes/              # 라우팅/레이아웃
-│     ├─ index.tsx         # 전체 라우팅 정의
-│     ├─ layouts/
-│     │  ├─ RootLayout.tsx
-│     │  └─ AppLayout.tsx
-│     └─ guards/
-│        └─ RequireAuth.tsx
-│
-├─ pages/                  # 페이지 단위 (라우팅 기준)
-│  ├─ home/
-│  │  └─ Home2.tsx         # 홈 + 로그인 모달 제어
-│  └─ book/
-│     ├─ Booking.tsx
-│     ├─ BookingConfirm.tsx
-│     └─ PaySuccess.tsx
-│
-├─ widgets/                # 재사용 가능한 UI 블록
-│  ├─ home2/
-│  │  ├─ LoginSheet.tsx
-│  │  ├─ HeroBubble.tsx
-│  │  └─ PrimaryActions.tsx
-│  └─ booking/
-│     ├─ Calendar.tsx
-│     └─ TimeGrid.tsx
-│
-├─ entities/               # 도메인 단위 로직
-│  └─ auth/
-│     └─ hooks/
-│        └─ useAuth.ts     # mock 로그인 상태 관리
-│
-├─ shared/                 # 전역 유틸/훅/UI
-│  ├─ ui/
-│  │  ├─ LoadingBar.tsx
-│  │  └─ DelayedFallback.tsx
-│  ├─ hooks/
-│  │  └─ timing/
-│  └─ lib/
-│     └─ datetime.ts
-│
-└─ main.tsx                # React DOM entry
+├─ app/          # 전역 설정, 라우팅, 레이아웃
+├─ pages/        # 페이지 단위 화면 (홈, 예약, 결제)
+├─ widgets/      # 재사용 가능한 UI 컴포넌트
+├─ entities/     # 도메인 로직 (인증)
+├─ shared/       # 공통 UI / 훅 / 유틸
+└─ main.tsx      # React entry point
+```
 
-
-## 설계 의도
-- Layout 기반 라우팅 구조
-RootLayout → AppLayout → Page 구조로 페이지 공통 영역과 화면 영역을 분리했습니다.
-
-- UI는 widgets로 분리
-Page는 “흐름/라우팅/상태 연결” 중심으로 두고, 캘린더/시간표/로그인 시트 같은 UI는 widgets로 분리했습니다.
-
-- Mock 인증(과제 목적에 맞춘 단순화)
-백엔드 의존 없이 화면/구조/UX를 설명할 수 있도록 mock 인증으로 구성했습니다.
-또한 새로고침 시 상태 유지보다는  
-면접 환경에서 언제든 동일한 흐름을 재현할 수 있도록 단순한 방식으로 관리했습니다.
 
 ## 핵심 파일
-아래 파일들만 확인하실 수 있도록 정리했습니다.
+아래 파일들만 확인하시면 전체 구조와 흐름을 파악할 수 있습니다.
 
-### 앱 진입/Provider
-- src/app/App.tsx
-- src/app/providers/AppProviders.tsx
+### 앱 진입 / 라우팅
+- src/app/App.tsx (전역 Provider를 묶어 RouterProvider를 연결하는 앱 진입 파일)
+- src/app/routes/index.tsx (전체 페이지 라우팅과 레이아웃 구조를 정의)
+- src/app/providers/AppProviders.tsx (헤더 등 공통 UI를 포함한 기본 레이아웃 컴포넌트)
 
-### 라우팅/레이아웃
-- src/app/routes/index.tsx
-- src/app/routes/layouts/AppLayout.tsx
-
-### 로그인
-- src/pages/home/Home2.tsx
-- src/widgets/home2/LoginSheet.tsx
-- src/entities/auth/hooks/useAuth.ts
+### 로그인 / 인증
+- src/pages/home/Home2.tsx (홈 화면 및 로그인 모달의 흐름을 제어하는 페이지)
+- src/widgets/home2/LoginSheet.tsx (로그인 입력 및 인증 트리거를 담당하는 로그인 모달 UI)
+- src/entities/auth/hooks/useAuth.ts (로그인 상태와 role 정보를 관리하는 mock 인증 훅)
 
 ### 예약 
-- src/pages/book/Booking.tsx
-- src/widgets/booking/Calendar.tsx (또는 TimeGrid.tsx)
+- src/pages/book/Booking.tsx (예약 페이지의 전체 흐름을 담당하는 페이지 컴포넌트)
+- src/widgets/booking/Calendar.tsx (날짜 선택을 담당하는 캘린더 UI 컴포넌트)
+- src/widgets/booking/TimeGrid.tsx (선택 가능 시간 목록을 표시하는 UI 컴포넌트)
 
 ---
