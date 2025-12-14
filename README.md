@@ -40,6 +40,7 @@ npm run dev
 - 결제 완료 후 성공 페이지 진입 및 관련 UI 구성을 포함합니다.
 
 ## 프로젝트 구조 (아키텍처)
+```
 src/
 ├─ app/                    # 앱 진입 및 전역 설정
 │  ├─ App.tsx              # RouterProvider 연결
@@ -86,6 +87,7 @@ src/
 │     └─ datetime.ts
 │
 └─ main.tsx                # React DOM entry
+```
 
 
 ## 설계 의도
