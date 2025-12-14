@@ -1,4 +1,3 @@
-// src/widgets/booking/TimeGrid.tsx
 import { slotToDate } from "@/shared/lib/datetime"
 import { useEffect, useMemo } from "react"
 
@@ -15,14 +14,11 @@ function buildTimes(start = "10:00", end = "21:00", stepMin = 60) {
   }
   return out
 }
-
-type AnyAvail = string[] | { availableTime?: string[] } | { result?: { availableTime?: string[] } }
-
 interface Props {
   selectedDate: Date | null
   selectedTime: string
   onSelectTime: (t: string) => void
-  apiTimes?: AnyAvail // 명세 응답 그대로/배열 모두 허용
+  apiTimes: string[]
   startTime?: string // "10:00"
   endTime?: string // "18:00"
 }
@@ -37,15 +33,7 @@ export default function TimeGrid({
 }: Props) {
   const now = new Date()
 
-  // 어떤 형태로 와도 availableTime 배열로 정규화
-  const available: string[] = useMemo(() => {
-    if (Array.isArray(apiTimes)) return apiTimes.map(String)
-    if (apiTimes && Array.isArray((apiTimes as any).availableTime))
-      return (apiTimes as any).availableTime.map(String)
-    if ((apiTimes as any)?.result?.availableTime)
-      return (apiTimes as any).result.availableTime.map(String)
-    return []
-  }, [apiTimes])
+  const available: string[] = useMemo(() => apiTimes ?? [], [apiTimes])
 
   const items = useMemo(() => {
     if (!selectedDate) return []

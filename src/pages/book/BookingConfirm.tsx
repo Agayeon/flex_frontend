@@ -5,8 +5,8 @@ import BookingSummaryCard from "@/widgets/booking/BookingSummaryCard"
 
 type BookingState = {
   title: string
-  date: string // "YYYY-MM-DD"
-  time: string // "HH:mm" 등
+  date: string
+  time: string
   price: number
   mentosSeq?: number
   mentorName?: string
@@ -46,7 +46,7 @@ export default function BookingConfirm() {
 
   const [submitting, setSubmitting] = useState(false)
 
-  // ✅ 과제용 결제 시뮬레이션 (로그인/실제 결제 API 없음)
+  // 과제용 결제 시뮬레이션 (로그인/실제 결제 API 없음)
   const handlePay = async () => {
     if (!valid || submitting) return
 
@@ -65,7 +65,6 @@ export default function BookingConfirm() {
       orderId: `mock_order_${Date.now()}`,
     }
 
-    // ✅ "나의 멘토링" mock 저장
     try {
       const prev = JSON.parse(localStorage.getItem("mock:myMentoring") || "[]")
       localStorage.setItem("mock:myMentoring", JSON.stringify([payload, ...prev]))
@@ -73,7 +72,7 @@ export default function BookingConfirm() {
       // ignore
     }
 
-    // ✅ 결제 성공 페이지로 이동
+    // 결제 성공
     setTimeout(() => {
       navigate("/payments/success", { replace: true, state: payload })
       setSubmitting(false)

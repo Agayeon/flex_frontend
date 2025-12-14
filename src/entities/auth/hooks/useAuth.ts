@@ -17,6 +17,7 @@ const KEY = "mock_user_session"
 const DEMO_ID = "flex"
 const DEMO_PW = "1234"
 
+// sessionStorage에서 사용자 정보를 읽어옴
 function read(): User | null {
   try {
     const raw = sessionStorage.getItem(KEY)
@@ -26,12 +27,16 @@ function read(): User | null {
   }
 }
 
+// sessionStorage에 사용자 정보를 기록
 function write(user: User | null) {
   if (!user) sessionStorage.removeItem(KEY)
   else sessionStorage.setItem(KEY, JSON.stringify(user))
+
+  // 다른 탭에서 변경 사항을 감지할 수 있도록 이벤트 발송
   window.dispatchEvent(new Event("mock-auth-changed"))
 }
 
+// 인증 훅
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
 
@@ -45,7 +50,7 @@ export function useAuth() {
     return () => window.removeEventListener("mock-auth-changed", onChanged)
   }, [])
 
-  // mock data인 flex/1234만 로그인 성공
+  // mock 계정인 flex/1234만 로그인 성공
   const login = async (input: LoginInput) => {
     const id = input?.memberId?.trim()
     const pw = input?.memberPwd
